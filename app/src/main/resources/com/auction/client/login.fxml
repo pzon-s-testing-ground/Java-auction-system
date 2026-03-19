@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+
+<VBox alignment="CENTER" spacing="15.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.LoginController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    </padding>
+    
+    <Label text="Online Auction System" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    
+    <TextField fx:id="userIdField" promptText="Enter User ID (e.g., bidder123)" maxWidth="250"/>
+    <TextField fx:id="auctionIdField" promptText="Enter Auction ID (e.g., A001)" maxWidth="250"/>
+    
+    <Button fx:id="joinButton" text="Join Auction" onAction="#handleJoinAction" prefWidth="150"/>
+    
+    <Label fx:id="statusLabel" textFill="red" wrapText="true" maxWidth="300"/>
+</VBox>

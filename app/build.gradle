@@ -21,6 +21,10 @@ dependencies {
 
     // Thu vien Gson de xu ly JSON khi giao tiep qua Socket/REST API sau nay
     implementation 'com.google.code.gson:gson:2.10.1'
+
+    // THEM 2 DONG NAY DE EP VS CODE NHAN DIEN JAVAFX
+    implementation "org.openjfx:javafx-controls:21"
+    implementation "org.openjfx:javafx-fxml:21"
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -30,17 +34,14 @@ java {
     }
 }
 
-/* Temporarily disabled JavaFX until full setup
 javafx {
     version = "21"
     modules = [ 'javafx.controls', 'javafx.fxml' ]
-}*/
+}
 
 
 application {
-    // Define the main class for the application.
-    // Thay doi thanh package chuan ma chung ta se su dung
-    mainClass = 'org.example.App'
+    mainClass = 'com.auction.client.Main'
 }
 
 tasks.named('test') {

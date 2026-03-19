@@ -13,15 +13,15 @@ public class ServerController {
             JsonObject request = JsonParser.parseString(jsonRequest).getAsJsonObject();
             String action = request.get("action").getAsString();
 
-            switch (action) {
-                case "JOIN_AUCTION":
-                    return handleJoinAuction(request);
-                case "PLACE_BID":
-                    return handlePlaceBid(request);
-                default:
-                    return "{\"status\":\"ERROR\", \"message\":\"Unknown action\"}";
-            }
-        } catch (Exception e) {
+            // 1. Su dung Switch Expression cua Java hien dai
+            return switch (action) {
+                case "JOIN_AUCTION" -> handleJoinAuction(request);
+                case "PLACE_BID" -> handlePlaceBid(request);
+                default -> "{\"status\":\"ERROR\", \"message\":\"Unknown action\"}";
+            };
+            
+        } catch (com.google.gson.JsonSyntaxException | IllegalStateException | NullPointerException e) {
+            // 2. Bat cac ngoai le cu the cua Gson thay vi Exception chung chung
             return "{\"status\":\"ERROR\", \"message\":\"Invalid JSON format\"}";
         }
     }
