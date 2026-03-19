@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Auction {
-    private String auctionId;
-    private Item item;
-    private Seller seller;
-    private List<BidTransaction> bidHistory;
+    private final String auctionId;
+    private final Item item;
+    private final Seller seller;
+    private final List<BidTransaction> bidHistory;
     private String status; // OPEN, RUNNING, FINISHED, PAID, CANCELED
     private Bidder currentWinner;
 

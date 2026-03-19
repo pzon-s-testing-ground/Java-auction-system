@@ -3,10 +3,10 @@ package com.auction.shared;
 import java.time.LocalDateTime;
 
 public class BidTransaction {
-    private String transactionId;
-    private Bidder bidder;
-    private double bidAmount;
-    private LocalDateTime timestamp;
+    private final String transactionId;
+    private final Bidder bidder;
+    private final double bidAmount;
+    private final LocalDateTime timestamp;
 
     public BidTransaction(String transactionId, Bidder bidder, double bidAmount) {
         this.transactionId = transactionId;
