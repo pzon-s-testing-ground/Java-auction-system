@@ -18,16 +18,16 @@ public class AuctionClient {
 
             System.out.println("Connected to Auction Server.");
 
-            // Tao mot request JSON su dung Gson
+            // Tao mot request JSON su dung Gson de dat gia
             JsonObject request = new JsonObject();
-            request.addProperty("action", "JOIN_AUCTION");
+            request.addProperty("action", "PLACE_BID");
             request.addProperty("userId", "bidder123");
             request.addProperty("auctionId", "A001");
+            request.addProperty("bidAmount", 1050.0); // Dat gia 1050 (cao hon gia khoi diem 1000)
 
             String jsonString = request.toString();
             System.out.println("Sending to server: " + jsonString);
             
-            // Gui JSON len Server
             out.println(jsonString);
 
             // Doc phan hoi tu Server
