@@ -25,6 +25,9 @@ dependencies {
     // THEM 2 DONG NAY DE EP VS CODE NHAN DIEN JAVAFX
     implementation "org.openjfx:javafx-controls:21"
     implementation "org.openjfx:javafx-fxml:21"
+
+    // them sqlite
+    implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

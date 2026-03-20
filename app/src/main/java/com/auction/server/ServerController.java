@@ -60,6 +60,8 @@ public class ServerController {
         boolean success = auction.placeBid(bid);
 
         if (success) {
+            dao.saveAuction(auction);
+
             response.addProperty("status", "SUCCESS");
             response.addProperty("message", "Bid placed successfully. Current highest bid is now $" + auction.getItem().getCurrentHighestBid());
         } else {
