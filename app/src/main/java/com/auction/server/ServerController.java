@@ -15,8 +15,11 @@ public class ServerController {
 
             // 1. Su dung Switch Expression cua Java hien dai
             return switch (action) {
+                case "SIGNUP" -> handleSignup(request);
+                case "LOGIN" -> handleLogin(request);
                 case "JOIN_AUCTION" -> handleJoinAuction(request);
                 case "PLACE_BID" -> handlePlaceBid(request);
+                case "GET_AUCTIONS" -> handleGetAuctions();
                 default -> "{\"status\":\"ERROR\", \"message\":\"Unknown action\"}";
             };
             
@@ -83,6 +86,51 @@ public class ServerController {
             response.addProperty("message", "Bid rejected. Amount must be higher than current bid ($" + auction.getItem().getCurrentHighestBid() + ") and auction must be RUNNING.");
         }
 
+        return response.toString();
+    }
+
+    // XU LY SIGNUP
+    private String handleSignup(JsonObject request) {
+        String username = request.get("username").getAsString();
+        String password = request.get("password").getAsString();
+
+        boolean success = UserDAO.getInstance().registerUser(username, password);
+        JsonObject response = new JsonObject();
+        
+        if (success) {
+            response.addProperty("status", "SUCCESS");
+            response.addProperty("message", "Account created successfully. You can now log in.");
+        } else {
+            response.addProperty("status", "FAILED");
+            response.addProperty("message", "Username already exists.");
+        }
+        return response.toString();
+    }
+
+    // XU LY LOGIN
+    private String handleLogin(JsonObject request) {
+        String username = request.get("username").getAsString();
+        String password = request.get("password").getAsString();
+
+        boolean success = UserDAO.getInstance().authenticateUser(username, password);
+        JsonObject response = new JsonObject();
+
+        if (success) {
+            response.addProperty("status", "SUCCESS");
+            response.addProperty("message", "Login successful.");
+            response.addProperty("username", username);
+        } else {
+            response.addProperty("status", "FAILED");
+            response.addProperty("message", "Invalid username or password.");
+        }
+        return response.toString();
+    }
+
+    private String handleGetAuctions() {
+        JsonObject response = new JsonObject();
+        response.addProperty("status", "SUCCESS");
+        // Goi ham cua Thanh vien 2 de lay danh sach
+        response.add("auctions", AuctionDAO.getInstance().getAllAuctionsAsJson());
         return response.toString();
     }
 }

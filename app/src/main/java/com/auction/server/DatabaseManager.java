@@ -67,8 +67,16 @@ public class DatabaseManager {
                 + "status TEXT NOT NULL"
                 + ");";
 
+
+        String createUsersTable = "CREATE TABLE IF NOT EXISTS users ("
+                + "username TEXT PRIMARY KEY,"
+                + "password TEXT NOT NULL"
+                + ");";
+
+    
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(createTableSQL);
+            stmt.execute(createUsersTable);
             System.out.println("Database tables initialized.");
         } catch (SQLException e) {
             System.err.println("Error initializing tables: " + e.getMessage());
