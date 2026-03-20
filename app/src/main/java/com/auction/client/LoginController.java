@@ -20,10 +20,14 @@ import javafx.stage.Stage;
 
 public class LoginController {
 
-    @FXML private TextField userIdField;
-    @FXML private TextField auctionIdField;
-    @FXML private Button joinButton;
-    @FXML private Label statusLabel;
+    @FXML
+    private TextField userIdField;
+    @FXML
+    private TextField auctionIdField;
+    @FXML
+    private Button joinButton;
+    @FXML
+    private Label statusLabel;
 
     @FXML
     protected void handleJoinAction(ActionEvent event) {
@@ -39,9 +43,7 @@ public class LoginController {
     }
 
     private void sendJoinRequest(String userId, String auctionId) {
-        try (Socket socket = new Socket("127.0.0.1", 8080); 
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+        try (Socket socket = new Socket("127.0.0.1", 8080); PrintWriter out = new PrintWriter(socket.getOutputStream(), true); BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
             JsonObject request = new JsonObject();
             request.addProperty("action", "JOIN_AUCTION");
@@ -50,20 +52,24 @@ public class LoginController {
 
             out.println(request.toString());
             String response = in.readLine();
-            
+
             // 1. Parse JSON tra ve tu Server
             JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
             String status = jsonResponse.get("status").getAsString();
 
             // 2. Kiem tra status, neu SUCCESS thi chuyen canh
             if ("SUCCESS".equals(status)) {
+                // Boc tach thong tin san pham tu Server gui ve
+                String itemName = jsonResponse.get("itemName").getAsString();
+                double currentBid = jsonResponse.get("currentBid").getAsDouble();
+
                 // Load file fxml moi
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/bidding.fxml"));
                 Parent root = loader.load();
 
-                // Lay controller cua man hinh moi de truyen userId va auctionId
+                // Lay controller cua man hinh moi de truyen toan bo du lieu sang
                 BiddingController biddingController = loader.getController();
-                biddingController.initData(userId, auctionId);
+                biddingController.initData(userId, auctionId, itemName, currentBid);
 
                 // Lay Stage (cua so hien tai) thong qua nut bam va doi Scene
                 Stage stage = (Stage) joinButton.getScene().getWindow();

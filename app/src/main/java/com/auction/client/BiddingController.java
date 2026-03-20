@@ -23,9 +23,14 @@ public class BiddingController {
     private String userId;
     private String auctionId;
 
-    public void initData(String userId, String auctionId) {
+    public void initData(String userId, String auctionId, String itemName, double currentBid) {
         this.userId = userId;
         this.auctionId = auctionId;
+        
+        // Hien thi du lieu thuc te lay tu Database
+        itemLabel.setText("Item: " + itemName);
+        priceLabel.setText("Current Highest Bid: $" + currentBid);
+        
         messageLabel.setStyle("-fx-text-fill: green;");
         messageLabel.setText("Welcome " + userId + "! You are in auction " + auctionId);
     }

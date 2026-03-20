@@ -8,13 +8,12 @@ import java.net.Socket;
 import com.google.gson.JsonObject;
 
 public class AuctionClient {
+
     private static final String SERVER_ADDRESS = "127.0.0.1";
     private static final int SERVER_PORT = 8080;
 
     public static void main(String[] args) {
-        try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+        try (Socket socket = new Socket(SERVER_ADDRESS, SERVER_PORT); PrintWriter out = new PrintWriter(socket.getOutputStream(), true); BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
             System.out.println("Connected to Auction Server.");
 
@@ -27,7 +26,7 @@ public class AuctionClient {
 
             String jsonString = request.toString();
             System.out.println("Sending to server: " + jsonString);
-            
+
             out.println(jsonString);
 
             // Doc phan hoi tu Server

@@ -29,12 +29,26 @@ public class ServerController {
     private String handleJoinAuction(JsonObject request) {
         String userId = request.get("userId").getAsString();
         String auctionId = request.get("auctionId").getAsString();
+
+        // Lay thong tin tu Database/Cache
+        AuctionDAO dao = AuctionDAO.getInstance();
+        com.auction.shared.Auction auction = dao.getAuction(auctionId);
+
         JsonObject response = new JsonObject();
-        response.addProperty("status", "SUCCESS");
-        response.addProperty("message", "User " + userId + " successfully joined auction " + auctionId);
+
+        if (auction != null) {
+            response.addProperty("status", "SUCCESS");
+            response.addProperty("message", "User " + userId + " successfully joined auction " + auctionId);
+            // Gui them thong tin thuc te cua san pham
+            response.addProperty("itemName", auction.getItem().getName());
+            response.addProperty("currentBid", auction.getItem().getCurrentHighestBid());
+        } else {
+            response.addProperty("status", "FAILED");
+            response.addProperty("message", "Auction ID " + auctionId + " does not exist.");
+        }
+        
         return response.toString();
     }
-
     // LOGIC XU LY DAT GIA
     private String handlePlaceBid(JsonObject request) {
         String userId = request.get("userId").getAsString();
