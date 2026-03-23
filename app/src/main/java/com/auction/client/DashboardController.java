@@ -1,9 +1,12 @@
 package com.auction.client;
 
+import java.io.IOException;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,7 +27,7 @@ public class DashboardController {
 
     private String username;
     // Danh sach dac biet cua JavaFX de tu dong cap nhat TableView khi co thay doi
-    private ObservableList<AuctionInfo> auctionList = FXCollections.observableArrayList();
+    private final ObservableList<AuctionInfo> auctionList = FXCollections.observableArrayList();
 
     public void initData(String username) {
         this.username = username;
@@ -118,7 +121,7 @@ public class DashboardController {
                 statusLabel.setStyle("-fx-text-fill: red;");
                 statusLabel.setText(jsonResponse.get("message").getAsString());
             }
-        } catch (Exception e) {
+        } catch (JsonSyntaxException | IOException e) {
             System.err.println("Error processing Dashboard response: " + e.getMessage());
         }
     }

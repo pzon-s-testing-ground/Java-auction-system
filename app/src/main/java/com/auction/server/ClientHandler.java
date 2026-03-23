@@ -1,42 +1,41 @@
 package com.auction.server;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable {
-
-    private final Socket clientSocket;
+    private Socket clientSocket;
+    private ServerController controller;
 
     public ClientHandler(Socket socket) {
         this.clientSocket = socket;
+        this.controller = new ServerController();
     }
 
     @Override
     public void run() {
-        // Khoi tao Controller
-        ServerController controller = new ServerController();
+        // Tu khoa 'true' trong PrintWriter giup tu dong day du lieu (auto-flush) ngay lap tuc
+        try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
-        try (
-                java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(clientSocket.getInputStream())); java.io.PrintWriter out = new java.io.PrintWriter(clientSocket.getOutputStream(), true)) {
             String inputLine;
+            
+            // VONG LAP NAY CUC KY QUAN TRONG: Giu cho Socket luon mo de lang nghe Client 24/7
             while ((inputLine = in.readLine()) != null) {
-                System.out.println("Received from client: " + inputLine);
-
-                // Goi Controller de xu ly JSON va lay ket qua tra ve
-                String jsonResponse = controller.processRequest(inputLine);
-
-                // Gui ket qua ve cho Client
-                out.println(jsonResponse);
-            }
-        } catch (java.io.IOException e) {
-            System.err.println("Communication error with client: " + e.getMessage());
-        } finally {
-            try {
-                if (clientSocket != null && !clientSocket.isClosed()) {
-                    clientSocket.close();
+                System.out.println("[Server] Received from client: " + inputLine);
+                
+                // Dua request cho Controller xu ly, kem theo 'out' de Controller biet duong ghi danh vao SessionManager
+                String response = controller.processRequest(inputLine, out);
+                
+                // Tra loi rieng cho Client vua gui yeu cau
+                if (response != null && !response.isEmpty()) {
+                    out.println(response);
                 }
-            } catch (java.io.IOException e) {
-                System.err.println("Error closing socket: " + e.getMessage());
             }
+        } catch (Exception e) {
+            System.out.println("[Server] Client disconnected: " + clientSocket.getInetAddress().getHostAddress());
         }
     }
 }
