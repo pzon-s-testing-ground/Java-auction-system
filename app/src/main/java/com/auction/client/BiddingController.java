@@ -1,10 +1,5 @@
 package com.auction.client;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -27,70 +22,65 @@ public class BiddingController {
         this.userId = userId;
         this.auctionId = auctionId;
         
-        // Hien thi du lieu thuc te lay tu Database
         itemLabel.setText("Item: " + itemName);
         priceLabel.setText("Current Highest Bid: $" + currentBid);
-        
         messageLabel.setStyle("-fx-text-fill: green;");
         messageLabel.setText("Welcome " + userId + "! You are in auction " + auctionId);
+
+        // Lang nghe tin nhan tu Server thong qua mang luoi chung
+        NetworkManager.getInstance().setCallback(this::processServerResponse);
     }
 
     @FXML
     protected void handlePlaceBid(ActionEvent event) {
         String bidText = bidAmountField.getText().trim();
-        
-        if (bidText.isEmpty()) {
-            messageLabel.setStyle("-fx-text-fill: red;");
-            messageLabel.setText("Please enter a bid amount.");
-            return;
-        }
+        if (bidText.isEmpty()) return;
 
         try {
-            // Chuyen chuoi nhap vao thanh so thuc (double)
             double bidAmount = Double.parseDouble(bidText);
-            sendBidToServer(bidAmount);
-        } catch (NumberFormatException e) {
-            messageLabel.setStyle("-fx-text-fill: red;");
-            messageLabel.setText("Invalid amount. Please enter numbers only.");
-        }
-    }
-
-    private void sendBidToServer(double bidAmount) {
-        try (Socket socket = new Socket("127.0.0.1", 8080);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-
-            // Tao request JSON de dat gia
+            
+            // TUYET DOI KHONG DUNG "new Socket()" O DAY NUA
+            // Dung NetworkManager de gui qua duong truyen dang mo san
             JsonObject request = new JsonObject();
             request.addProperty("action", "PLACE_BID");
             request.addProperty("userId", userId);
             request.addProperty("auctionId", auctionId);
             request.addProperty("bidAmount", bidAmount);
 
-            // Gui len Server
-            out.println(request.toString());
-            
-            // Nhan phan hoi
-            String response = in.readLine();
-            JsonObject jsonResponse = JsonParser.parseString(response).getAsJsonObject();
-            String status = jsonResponse.get("status").getAsString();
-            String message = jsonResponse.get("message").getAsString();
+            NetworkManager.getInstance().sendMessage(request.toString());
+            bidAmountField.clear();
 
-            if ("SUCCESS".equals(status)) {
-                messageLabel.setStyle("-fx-text-fill: green;");
-                messageLabel.setText("Success! " + message);
-                
-                // Cap nhat lai gia hien thi tren giao dien
-                priceLabel.setText("Current Highest Bid: $" + bidAmount);
-                bidAmountField.clear(); // Xoa trang o nhap lieu
-            } else {
-                messageLabel.setStyle("-fx-text-fill: red;");
-                messageLabel.setText("Failed: " + message);
-            }
-
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             messageLabel.setStyle("-fx-text-fill: red;");
-            messageLabel.setText("Connection error: " + e.getMessage());
+            messageLabel.setText("Invalid amount.");
+        }
+    }
+
+    private void processServerResponse(String response) {
+        try {
+            JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+            
+            if (json.has("action") && "BROADCAST_NEW_BID".equals(json.get("action").getAsString())) {
+                double newBid = json.get("newBid").getAsDouble();
+                String bidder = json.get("bidder").getAsString();
+                
+                // Giao dien tu dong nhay so
+                priceLabel.setText("Current Highest Bid: $" + newBid);
+                
+                if (this.userId.equals(bidder)) {
+                    messageLabel.setStyle("-fx-text-fill: green;");
+                    messageLabel.setText("Your bid was successful!");
+                } else {
+                    messageLabel.setStyle("-fx-text-fill: #b8860b;");
+                    messageLabel.setText("User " + bidder + " just placed a new bid!");
+                }
+            } 
+            else if (json.has("status") && "FAILED".equals(json.get("status").getAsString())) {
+                messageLabel.setStyle("-fx-text-fill: red;");
+                messageLabel.setText(json.get("message").getAsString());
+            }
+        } catch (Exception e) {
+            System.err.println("Error parsing bidding response: " + e.getMessage());
         }
     }
 }
